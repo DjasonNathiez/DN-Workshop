@@ -1,82 +1,88 @@
 using System;
 using System.Collections.Generic;
-using Unity.Mathematics;
 using UnityEngine;
 
 namespace Player
 {
     public class Player : MonoBehaviour
     {
-        private int _healthPoint;
-        private int _manaPoint;
-        
-        private int _damagePoint;
-        private bool _piercing; //power
+        public List<Inventory> inventories;
+        public List<BagSlotObj> bagSlots;
+        public int bagSlot;
+        public GameObject slotPrefab;
 
-        public GameObject goPrefab;
-        public List<GameObject> _pool;
-        public Vector3 initPos;
-        public int maxSizePool;
+        public int maxColumn;
+        public int maxLines;
 
-        private void Update()
+        [Serializable] public class BagSlotObj
         {
-            if (Input.GetKeyDown(KeyCode.Mouse0))
-            {
-                Fire();
-            }
+            public GameObject go;
+            public Items item;
+            public int count;
         }
 
-        void Fire()
+        [Serializable] public class Inventory
         {
-            if (_pool.Count == 0)
+            public Items item;
+            public int countOfObject;
+        }
+
+        private void Start()
+        {
+            Initialize();
+        }
+
+        void Initialize()
+        {
+            IUpdateSlots();
+        }
+
+        void AddToInventory(Items i, int count = 1)
+        {
+            var newItem = new Inventory
             {
-                var go = Instantiate(goPrefab, initPos, quaternion.identity);
-                _pool.Add(go);
-                go.GetComponent<Rigidbody>().AddForce(transform.forward * Time.deltaTime, ForceMode.Impulse);
-            }
-            else
+                item = i,
+                countOfObject = count
+            };
+            
+            inventories.Add(newItem);
+        }
+
+        void IUpdateSlots()
+        {
+            int x = 0;
+            int y = 0;
+            
+            for (int i = 0; i < bagSlot; i++)
             {
-                foreach (var gob in _pool)
+                x++;
+                Debug.Log(x);
+                if (x >= maxColumn)
                 {
-                   
-                    if (gob.gameObject != goPrefab)
-                    {
-                        if (_pool.Count > maxSizePool)
-                        {
-                            if (!gob.activeSelf)
-                            {
-                                gob.SetActive(false);
-                            }
-                        }
-                        else
-                        {
-                            var go = Instantiate(goPrefab, initPos, quaternion.identity);
-                            _pool.Add(go);
-                            go.GetComponent<Rigidbody>().AddForce(transform.forward * Time.deltaTime * 100, ForceMode.Impulse);
-                        }
-                    }
-                    else
-                    {
-                        if (!gob.activeSelf)
-                        {
-                            gob.transform.position = initPos;
-                            gob.GetComponent<Rigidbody>().AddForce(transform.forward * Time.deltaTime * 100, ForceMode.Impulse);
-                        }
-                    }
+                    x = 0;
+                    y++;
+                    Debug.Log(y);
                 }
+                
+                var pos = new Vector2(slotPrefab.transform.position.x + x, slotPrefab.transform.position.y + y);
+
+                var newBagSlot = new BagSlotObj
+                {
+                    go = Instantiate(slotPrefab, pos, Quaternion.identity)
+                };
+                        
+                bagSlots.Add(newBagSlot);
             }
-            
-            
+            IUpdateItems();
         }
-
-
-        private void OnTriggerEnter(Collider other)
+        
+        void IUpdateItems()
         {
-            AI ai = other.GetComponent<AI>();
-
-            if (ai && ai.IsHealthMoreThan(4))
+            for (int i = 0; i < inventories.Count; i++)
             {
-                ai.GetHurt(_damagePoint, _piercing);
+                bagSlots[i].item = inventories[i].item;
+                bagSlots[i].count = inventories[i].countOfObject;
+                bagSlots[i].go.GetComponent<MeshRenderer>().material.color = Color.blue;
             }
         }
     }
