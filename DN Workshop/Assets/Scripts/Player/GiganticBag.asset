@@ -9,9 +9,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6376e1309aaee2448bd25a5216aeea70, type: 3}
-  m_Name: Sword
+  m_Script: {fileID: 11500000, guid: 150bc3089198210459d3bf0cd871d38f, type: 3}
+  m_Name: GiganticBag
   m_EditorClassIdentifier: 
-  itemName: sword
-  sellValue: 8
-  buyValue: 12
+  itemName: Gigantic Bag
+  sellValue: 0
+  buyValue: 0
+  slots: 12

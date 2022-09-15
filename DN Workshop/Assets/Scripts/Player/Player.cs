@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using Image = UnityEngine.UI.Image;
 
 namespace Player
 {
@@ -8,9 +9,15 @@ namespace Player
     {
         public List<Inventory> inventories;
         public List<BagSlotObj> bagSlots;
-        public int bagSlot;
+        private int bagSlot;
+        public Items_Bag[] bags;
+        public int maxBags;
+       
+        
         public GameObject slotPrefab;
-
+        public Transform slotParent;
+        public float spaceSlot;
+        
         public int maxColumn;
         public int maxLines;
 
@@ -50,10 +57,17 @@ namespace Player
 
         void IUpdateSlots()
         {
+            foreach (var b in bags)
+            {
+                bagSlot += b.slots;
+            }
+            
+            Debug.Log(bagSlot);
+            
             int x = 0;
             int y = 0;
             
-            for (int i = 0; i < bagSlot; i++)
+            for (int i = -1; i < bagSlot; i++)
             {
                 x++;
                 Debug.Log(x);
@@ -64,13 +78,14 @@ namespace Player
                     Debug.Log(y);
                 }
                 
-                var pos = new Vector2(slotPrefab.transform.position.x + x, slotPrefab.transform.position.y + y);
+                var pos = new Vector2(slotPrefab.transform.position.x + x * spaceSlot, slotPrefab.transform.position.y + y * spaceSlot);
 
                 var newBagSlot = new BagSlotObj
                 {
-                    go = Instantiate(slotPrefab, pos, Quaternion.identity)
+                    go = Instantiate(slotPrefab, pos, Quaternion.identity, slotParent)
+                    
                 };
-                        
+                newBagSlot.go.transform.position = pos;   
                 bagSlots.Add(newBagSlot);
             }
             IUpdateItems();
@@ -82,7 +97,7 @@ namespace Player
             {
                 bagSlots[i].item = inventories[i].item;
                 bagSlots[i].count = inventories[i].countOfObject;
-                bagSlots[i].go.GetComponent<MeshRenderer>().material.color = Color.blue;
+                bagSlots[i].go.GetComponent<Image>().color = Color.blue;
             }
         }
     }
